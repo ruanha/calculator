@@ -8,7 +8,11 @@ function reset() {
     num1 = "";
     num2 = "";
     operator = "";
-    displayValue.innerHTML = "";
+    clearDisplay();
+}
+
+function clearDisplay(){
+    displayValue.innerHTML = ""
 }
 
 function updateDisplay(input) {
@@ -19,7 +23,6 @@ function updateDisplay(input) {
 
 function calculate(e){
     result = operate(operator, num1, num2)
-    console.log("result: ", result);
     return result;
 }
 
@@ -36,12 +39,15 @@ const numbers = document.querySelectorAll('.number');
 numbers.forEach((button) => {
     button.addEventListener('click', (e)=>
     {
-        if (!operator) {
-            num1 += e.target.innerHTML
-        } else {
-            num2 += e.target.innerHTML
+        if (e.target['id']!= "dot" || !displayValue.innerHTML.includes(".")) {
+
+            if (!operator) {
+                num1 += e.target.innerHTML
+            } else {
+                num2 += e.target.innerHTML
+            }
+            updateDisplay(e.target.innerHTML);
         }
-        updateDisplay(e.target.innerHTML);
     })
 })
 
@@ -53,7 +59,7 @@ operators.forEach((button) => {
     {
         if (num1 && !num2 && !operator) {
             operator = e.target.innerHTML;
-            updateDisplay(operator)
+            clearDisplay();
         }
     })
 })
@@ -64,15 +70,24 @@ equal.addEventListener('click', (e)=>{
     result = calculate(e);
     tempResult = result;
     reset();
-    displayValue.innerHTML = tempResult;
+    if (tempResult%1>0){
+        displayValue.innerHTML = tempResult.toFixed(12);
+    } else displayValue.innerHTML = tempResult;
     num1 = tempResult;
 });
 
 //the undo button
 const undo = document.querySelector("#undo")
 undo.addEventListener('click', (e)=>{
-
+    if (num1 && !num2) {
+        num1 = num1.slice(0, -1);
+    } else if (num1 && num2) {
+        num2 =  num2.slice(0, -1);
+    }
+    displayValue.innerHTML = displayValue.innerHTML.slice(0, -1);
 })
+
+// operate function
 
 function operate(operator, a, b) {
     console.log(operator);
@@ -100,8 +115,7 @@ function operate(operator, a, b) {
 
 //operations
 function add (a, b) {
-    console.log("in add: ", sa, b)
-    return a+b;
+    return +a + +b;
 }
 
 function subtract (a, b) {
